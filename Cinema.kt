@@ -21,34 +21,52 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
     }
 
     fun printRoom() {
+        println()
         println("Cinema:")
         println("  ${(1..numberCols).joinToString(" ")}")
         for (row in 1..numberRows) {
             println("$row ${matrix[row - 1].joinToString(" ")}")
         }
+        println()
     }
 }
 
 fun main() {
+    val cinema = getCiname()
+    while (true) {
+        printMenu()
+        when (readln()) {
+            "0" -> break
+            "1" -> cinema.printRoom()
+            "2" -> sellTicket(cinema)
+        }
+    }
+}
+
+fun getCiname(): Cinema {
     println("Enter the number of rows:")
     val rows = readln().toInt()
     println("Enter the number of seats in each row:")
     val cols = readln().toInt()
-
     println()
-    val cinema = Cinema(rows, cols)
-    cinema.printRoom()
+    return Cinema(rows, cols)
+}
 
+fun sellTicket(cinema: Cinema) {
     println()
     println("Enter a row number:")
     val rowNumber = readln().toInt()
     println("Enter a seat number in that row:")
     val colNumber = readln().toInt()
-
-    println()
     val ticket = cinema.buyTicket(rowNumber, colNumber)
     ticket.printPrice()
-
     println()
-    cinema.printRoom()
+}
+
+fun printMenu() {
+    println("""
+        1. Show the seats
+        2. Buy a ticket
+        0. Exit
+        """.trimIndent())
 }
