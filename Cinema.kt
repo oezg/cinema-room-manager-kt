@@ -8,15 +8,32 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
 
     class Ticket(val row: Int, val col: Int, val price: Int) {
         fun printPrice() {
-            println("Ticket price: ${'$'}$price")
+            println("Ticket price: \$$price")
         }
     }
 
     val matrix = (1..numberRows).map { MutableList(numberCols) { _ -> Seat.S } }
+    var numberOfSoldTickets = 0
+    val numberOfSeats = numberRows * numberCols
+
+    var currentIncome = 0
+    val totalIncome =
+        if (numberOfSeats <= 60)
+            10 * numberOfSeats
+        else
+            numberOfSeats * 8 + numberRows / 2 * numberCols * 2
 
     fun buyTicket(row: Int, col: Int): Ticket {
+        if (row > numberRows || col > numberCols) {
+            throw ArrayIndexOutOfBoundsException()
+        }
+        if (matrix[row - 1][col - 1] == Seat.B) {
+            throw IllegalArgumentException()
+        }
         matrix[row - 1][col - 1] = Seat.B
-        val price = if (numberRows * numberCols <= 60) 10 else if (row > numberRows / 2) 8 else 10
+        numberOfSoldTickets++
+        val price = if (numberOfSeats <= 60) 10 else if (row > numberRows / 2) 8 else 10
+        currentIncome += price
         return Ticket(row, col, price)
     }
 
@@ -29,6 +46,14 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
         }
         println()
     }
+
+    fun printStatistics() {
+        val percentage = String.format("%.2f", numberOfSoldTickets.toDouble().div(numberOfSeats) * 100)
+        println("Number of purchased tickets: $numberOfSoldTickets\n" +
+                "Percentage: $percentage%\n" +
+                "Current income: \$$currentIncome\n" +
+                "Total income: \$$totalIncome")
+    }
 }
 
 fun main() {
@@ -39,6 +64,7 @@ fun main() {
             "0" -> break
             "1" -> cinema.printRoom()
             "2" -> sellTicket(cinema)
+            "3" -> cinema.printStatistics()
         }
     }
 }
@@ -58,15 +84,24 @@ fun sellTicket(cinema: Cinema) {
     val rowNumber = readln().toInt()
     println("Enter a seat number in that row:")
     val colNumber = readln().toInt()
-    val ticket = cinema.buyTicket(rowNumber, colNumber)
-    ticket.printPrice()
-    println()
+    try {
+        val ticket = cinema.buyTicket(rowNumber, colNumber)
+        ticket.printPrice()
+        println()
+    } catch (e: ArrayIndexOutOfBoundsException) {
+        println("Wrong input!")
+        sellTicket(cinema)
+    } catch (e: IllegalArgumentException) {
+        println("That ticket has already been purchased!")
+        sellTicket(cinema)
+    }
 }
 
 fun printMenu() {
     println("""
         1. Show the seats
         2. Buy a ticket
+        3. Statistics
         0. Exit
         """.trimIndent())
 }
