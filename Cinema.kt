@@ -6,7 +6,7 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
         B
     }
 
-    class Ticket(val row: Int, val col: Int, val price: Int) {
+    class Ticket(val price: Int) {
         fun printPrice() {
             println("Ticket price: \$$price")
         }
@@ -23,7 +23,7 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
         else
             numberOfSeats * 8 + numberRows / 2 * numberCols * 2
 
-    fun buyTicket(row: Int, col: Int): Ticket {
+    fun sellTicket(row: Int, col: Int): Ticket {
         if (row > numberRows || col > numberCols) {
             throw ArrayIndexOutOfBoundsException()
         }
@@ -34,7 +34,7 @@ class Cinema(val numberRows: Int, val numberCols: Int) {
         numberOfSoldTickets++
         val price = if (numberOfSeats <= 60) 10 else if (row > numberRows / 2) 8 else 10
         currentIncome += price
-        return Ticket(row, col, price)
+        return Ticket(price)
     }
 
     fun printRoom() {
@@ -63,7 +63,7 @@ fun main() {
         when (readln()) {
             "0" -> break
             "1" -> cinema.printRoom()
-            "2" -> sellTicket(cinema)
+            "2" -> buyTicket(cinema)
             "3" -> cinema.printStatistics()
         }
     }
@@ -78,22 +78,22 @@ fun getCiname(): Cinema {
     return Cinema(rows, cols)
 }
 
-fun sellTicket(cinema: Cinema) {
+fun buyTicket(cinema: Cinema) {
     println()
     println("Enter a row number:")
     val rowNumber = readln().toInt()
     println("Enter a seat number in that row:")
     val colNumber = readln().toInt()
     try {
-        val ticket = cinema.buyTicket(rowNumber, colNumber)
+        val ticket = cinema.sellTicket(rowNumber, colNumber)
         ticket.printPrice()
         println()
     } catch (e: ArrayIndexOutOfBoundsException) {
         println("Wrong input!")
-        sellTicket(cinema)
+        buyTicket(cinema)
     } catch (e: IllegalArgumentException) {
         println("That ticket has already been purchased!")
-        sellTicket(cinema)
+        buyTicket(cinema)
     }
 }
 
